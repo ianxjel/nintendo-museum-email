@@ -16,6 +16,7 @@ import json
 import os
 import smtplib
 import sys
+import time
 from datetime import date, datetime, timezone
 from email.message import EmailMessage
 from pathlib import Path
@@ -102,8 +103,9 @@ def pretty(d: str) -> str:
     return date.fromisoformat(d).strftime("%a %b %-d")
 
 
-def main():
-    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+def check_once(test_email: bool) -> bool:
+    """One check. Returns True if the calendar was read successfully."""
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
     print(f"[{now}] Checking {DATE_FROM} to {DATE_TO}")
 
     seen = set()
@@ -114,12 +116,12 @@ def main():
         available = fetch_available_dates()
     except Exception as e:
         print(f"ERROR: {e}")
-        if TEST_EMAIL:
+        if test_email:
             send_email(
                 "⚠️ Nintendo Museum checker: test run failed",
                 f"The checker couldn't read the ticket calendar:\n\n{e}\n\nChecked at {now}.",
             )
-        sys.exit(1)
+        return False
 
     print("Available:", available or "none")
     new = [d for d in available if d not in seen]
@@ -131,7 +133,7 @@ def main():
             "Tickets just showed up for your trip dates:\n\n"
             f"{lines}\n\nBook fast: {CALENDAR_URL}\n\nChecked at {now}.",
         )
-    elif TEST_EMAIL:
+    elif test_email:
         status = f"Currently available:\n\n{lines}" if available else "Nothing available right now."
         send_email(
             "✅ Nintendo Museum checker is working",
@@ -143,6 +145,21 @@ def main():
     # and reopens later triggers a fresh alert.
     STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
     STATE_FILE.write_text(json.dumps(available))
+    return True
+
+
+def main():
+    # A test run checks once; scheduled runs check CHECKS times, INTERVAL seconds apart
+    # (GitHub's schedule can't go below every 5 minutes, so each run covers 5 minutes).
+    checks = 1 if TEST_EMAIL else int(os.environ.get("CHECKS") or 5)
+    interval = int(os.environ.get("INTERVAL") or 60)
+    ok = 0
+    for i in range(checks):
+        if i:
+            time.sleep(interval)
+        ok += check_once(TEST_EMAIL)
+    if ok == 0:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

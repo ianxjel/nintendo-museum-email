@@ -2,7 +2,7 @@ name: Nintendo Museum ticket alert
 
 on:
   schedule:
-    - cron: "*/10 * * * *"  # every 10 min; keeps a private repo under the free 2,000 Actions min/month
+    - cron: "*/5 * * * *"   # each run checks once a minute for ~5 min
   workflow_dispatch:
     inputs:
       test_email:
@@ -17,7 +17,7 @@ concurrency:
 jobs:
   check:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
 

@@ -1,6 +1,6 @@
 # Nintendo Museum ticket alert (private email)
 
-Checks the Nintendo Museum calendar every ~10 minutes from GitHub Actions and
+Checks the Nintendo Museum calendar about once a minute (a run starts every 5 min and checks 5 times) from GitHub Actions and
 emails you when bookable tickets appear in your date window. Ported from
 [BruceJian43/nintendo-museum-ticket-checker](https://github.com/BruceJian43/nintendo-museum-ticket-checker)
 (same API, same "bookable" rule). Default window: **Nov 1, 2026 only**.
@@ -37,7 +37,5 @@ Actions tab → the workflow → ⋯ → *Disable workflow*. Do this after your 
 - GitHub's schedule is best-effort; runs can be 5–15 min late at busy times.
 - If the test email says the site blocked the request, GitHub's servers are
   being refused by Nintendo; fall back to the original Chrome extension.
-- Private repos get 2,000 free Actions minutes/month and each run bills as
-  1 minute, so every-10-min uses ~144 min/day (~1,900 through Nov 4). If you
-  use Actions for other things, change the cron to `*/15` — and disable this
-  after the trip either way.
+- The repo is public so Actions minutes are free and unlimited. Secrets
+  (your Gmail address and app password) are never shown publicly.
