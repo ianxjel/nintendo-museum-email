@@ -3,7 +3,7 @@
 Checks the Nintendo Museum calendar every ~10 minutes from GitHub Actions and
 emails you when bookable tickets appear in your date window. Ported from
 [BruceJian43/nintendo-museum-ticket-checker](https://github.com/BruceJian43/nintendo-museum-ticket-checker)
-(same API, same "bookable" rule). Default window: **Oct 26 – Nov 4, 2026**.
+(same API, same "bookable" rule). Default window: **Nov 1, 2026 only**.
 
 ## Setup (~5 min)
 

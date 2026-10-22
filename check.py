@@ -30,8 +30,8 @@ UA = (
     "(KHTML, like Gecko) Chrome/130.0 Safari/537.36"
 )
 
-DATE_FROM = date.fromisoformat(os.environ.get("DATE_FROM") or "2026-10-26")
-DATE_TO = date.fromisoformat(os.environ.get("DATE_TO") or "2026-11-04")
+DATE_FROM = date.fromisoformat(os.environ.get("DATE_FROM") or "2026-11-01")
+DATE_TO = date.fromisoformat(os.environ.get("DATE_TO") or "2026-11-01")
 STATE_FILE = Path(os.environ.get("STATE_FILE") or "state/seen.json")
 TEST_EMAIL = (os.environ.get("TEST_EMAIL") or "").lower() == "true"
 
