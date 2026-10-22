@@ -1,0 +1,51 @@
+name: Nintendo Museum ticket alert
+
+on:
+  schedule:
+    - cron: "*/10 * * * *"  # every 10 min; keeps a private repo under the free 2,000 Actions min/month
+  workflow_dispatch:
+    inputs:
+      test_email:
+        description: "Send a test email with the current status"
+        type: boolean
+        default: true
+
+concurrency:
+  group: museum-check
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install requests
+
+      # Remembers which dates you were already emailed about
+      - uses: actions/cache/restore@v4
+        with:
+          path: state
+          key: museum-state-${{ github.run_id }}
+          restore-keys: museum-state-
+
+      - name: Check tickets
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          ALERT_TO: ${{ secrets.ALERT_TO }}
+          DATE_FROM: ${{ vars.DATE_FROM }}
+          DATE_TO: ${{ vars.DATE_TO }}
+          TEST_EMAIL: ${{ github.event_name == 'workflow_dispatch' && inputs.test_email }}
+        run: python check.py
+
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: state
+          key: museum-state-${{ github.run_id }}
