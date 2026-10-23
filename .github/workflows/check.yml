@@ -39,6 +39,10 @@ jobs:
           GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           ALERT_TO: ${{ secrets.ALERT_TO }}
+          TWILIO_ACCOUNT_SID: ${{ secrets.TWILIO_ACCOUNT_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.TWILIO_AUTH_TOKEN }}
+          TWILIO_FROM: ${{ secrets.TWILIO_FROM }}
+          CALL_TO: ${{ secrets.CALL_TO }}
           DATE_FROM: ${{ vars.DATE_FROM }}
           DATE_TO: ${{ vars.DATE_TO }}
           TEST_EMAIL: ${{ github.event_name == 'workflow_dispatch' && inputs.test_email }}

@@ -99,6 +99,35 @@ def send_email(subject: str, body: str):
     print(f"Email sent: {subject}")
 
 
+TRIAL_TEMPLATE = "https://webhooks.twilio.com/v1/Voice/Template/voice_text_to_speech"
+
+
+def place_call(message: str):
+    """Ring your phone via Twilio. Skipped if the Twilio secrets aren't set.
+    Never raises, so a call problem can't block the email."""
+    sid = os.environ.get("TWILIO_ACCOUNT_SID")
+    token = os.environ.get("TWILIO_AUTH_TOKEN")
+    from_num = os.environ.get("TWILIO_FROM")
+    to_num = os.environ.get("CALL_TO")
+    if not all([sid, token, from_num, to_num]):
+        return
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Calls.json"
+    twiml = f'<Response><Say voice="Polly.Joanna" loop="3">{message}</Say></Response>'
+    attempts = [
+        {"To": to_num, "From": from_num, "Twiml": twiml},          # custom spoken message
+        {"To": to_num, "From": from_num, "Url": TRIAL_TEMPLATE},   # trial-account fallback
+    ]
+    for data in attempts:
+        try:
+            r = requests.post(url, data=data, auth=(sid, token), timeout=30)
+            if r.ok:
+                print(f"Call placed to {to_num[:-4]}****")
+                return
+            print(f"WARN: Twilio call failed ({r.status_code}): {r.text[:300]}")
+        except Exception as e:
+            print(f"WARN: Twilio call error: {e}")
+
+
 def pretty(d: str) -> str:
     return date.fromisoformat(d).strftime("%a %b %-d")
 
@@ -128,12 +157,18 @@ def check_once(test_email: bool) -> bool:
     lines = "\n".join(f"  • {pretty(d)}  ({d})" for d in available)
 
     if new:
+        place_call(
+            "Nintendo Museum tickets are open for "
+            + ", ".join(date.fromisoformat(d).strftime("%B %-d") for d in new)
+            + ". Check your email and book now."
+        )
         send_email(
             f"🎟️ Nintendo Museum tickets open: {', '.join(pretty(d) for d in new)}",
             "Tickets just showed up for your trip dates:\n\n"
             f"{lines}\n\nBook fast: {CALENDAR_URL}\n\nChecked at {now}.",
         )
     elif test_email:
+        place_call("This is a test call from your Nintendo Museum ticket checker. It is working.")
         status = f"Currently available:\n\n{lines}" if available else "Nothing available right now."
         send_email(
             "✅ Nintendo Museum checker is working",

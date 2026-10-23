@@ -30,6 +30,15 @@ emails you when bookable tickets appear in your date window. Ported from
 After that it runs on its own. You get an email only when a **new** date opens;
 if a date sells out and reopens, you're alerted again.
 
+## Phone call alert (optional)
+If these secrets are set, it also calls your phone when tickets open
+(and on a test run):
+- `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN` – from the Twilio Console home page
+- `TWILIO_FROM` – your Twilio trial number, e.g. `+15551234567`
+- `CALL_TO` – your verified phone number, e.g. `+14075551234`
+
+Save the Twilio number as a contact so *Silence Unknown Callers* doesn't block it.
+
 ## Turning it off
 Actions tab → the workflow → ⋯ → *Disable workflow*. Do this after your trip.
 
